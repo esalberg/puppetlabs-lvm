@@ -8,13 +8,13 @@ define lvm::logical_volume (
   $fs_type           = 'ext4',
   $mountpath         = "/${name}",
   $mountpath_require = false,
-  $backup_lv         = false,
-  $backup_file       = '/tmp/backup.tar',
+  $restore_content   = false,
+  $restore_file      = '/tmp/restore.tar',
 ) {
 
   validate_bool($mountpath_require)
-  validate_bool($backup_lv)
-  validate_string($backup_file)
+  validate_bool($restore_content)
+  validate_string($restore_file)
 
   if $mountpath_require {
     Mount {
@@ -53,17 +53,17 @@ define lvm::logical_volume (
     command => "mkdir -p ${mountpath}",
     unless  => "test -d ${mountpath}",
   } ->
-  exec { "save data for '${mountpath}'":
+  exec { "save and cleanup data from '${mountpath}'":
     path      => [ '/bin', '/usr/bin' ],
     cwd       => $mountpath,
-    command   => "tar -cf ${backup_file} * && rm -rf ${mountpath}/*",
+    command   => "tar -cf ${restore_file} * && rm -rf ${mountpath}/*",
     logoutput => true,
-# Only if $backup_lv, ${mountpath} is not mounted working directory 
-# is not empty and ${backup_file} does not exist
+# Only if $restore_content, ${mountpath} is not mounted working directory 
+# is not empty and ${restore_file} does not exist
     onlyif    => ["test ! `mount | grep '${mountpath} '` >/dev/null 2>&1",
-                  "test ! -f ${backup_file}",
+                  "test ! -f ${restore_file}",
                   "test ! `ls ${mountpath} | wc -l` -eq 0",
-                  "test ${backup_lv}"],
+                  "test ${restore_content}"],
   } ->
   mount { $mountpath:
     ensure  => $mount_ensure,
@@ -74,21 +74,21 @@ define lvm::logical_volume (
     dump    => 1,
     atboot  => true,
   } ->
-  exec { "restore data from '${mountpath}'":
+  exec { "restore data to '${mountpath}'":
     path      => [ '/bin', '/usr/bin' ],
-    command   => "tar -xf ${backup_file} && rm -f ${backup_file}",
+    command   => "tar -xf ${restore_file} && rm -f ${restore_file}",
     cwd       => $mountpath,
     logoutput => true,
-# Only if $backup_lv, ${backup_file} is a file and ${mountpath} is empty
-    onlyif    => ["test -f ${backup_file}",
+# Only if $restore_content, ${restore_file} is a file and ${mountpath} is empty
+    onlyif    => ["test -f ${restore_file}",
                   "test `ls ${mountpath} | grep -v lost+found | wc -l` -eq 0",
-                  "test ${backup_lv}"],
+                  "test ${restore_content}"],
   } ->
-  exec { "Legacy ${backup_file} file exists":
+  exec { "Legacy ${restore_file} file exists":
     path      => [ '/bin', '/usr/bin' ],
-    command   => "echo Please review and cleanup ${backup_file}!",
+    command   => "echo Please review and cleanup ${restore_file}!",
     logoutput => true,
     loglevel  => 'warning',
-    onlyif    => "test -f ${backup_file}",
+    onlyif    => "test -f ${restore_file}",
   }
 }
