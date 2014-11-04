@@ -57,10 +57,11 @@ define lvm::logical_volume (
     path    => [ '/bin', '/usr/bin' ],
     cwd     => $mountpath,
     command => "tar -cf ${backup_file} *",
-# Only if $backup_lv, ${mountpath} is not mounted and 
-# ${backup_file} does not exist
+# Only if $backup_lv, ${mountpath} is not mounted working directory 
+# is not empty and ${backup_file} does not exist
     onlyif  => ["test ! `mount | grep '${mountpath} '` >/dev/null 2>&1",
                 "test ! -f ${backup_file}",
+                "test ! `ls ${mountpath} | wc -l` -eq 0",
                 "test ${backup_lv}"],
   } ->
   mount { $mountpath:
