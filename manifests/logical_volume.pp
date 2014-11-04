@@ -8,9 +8,13 @@ define lvm::logical_volume (
   $fs_type           = 'ext4',
   $mountpath         = "/${name}",
   $mountpath_require = false,
+  $backup_lv         = false,
+  $backup_file       = '/tmp/backup.tar',
 ) {
 
   validate_bool($mountpath_require)
+  validate_bool($backup_lv)
+  validate_string($backup_file)
 
   if $mountpath_require {
     Mount {
@@ -49,6 +53,16 @@ define lvm::logical_volume (
     command => "mkdir -p ${mountpath}",
     unless  => "test -d ${mountpath}",
   } ->
+  exec { "save data for '${mountpath}'":
+    path    => [ '/bin', '/usr/bin' ],
+    cwd     => $mountpath,
+    command => "tar -cf ${backup_file} *",
+# Only if $backup_lv, ${mountpath} is not mounted and 
+# ${backup_file} does not exist
+    onlyif  => ["test ! `mount | grep '${mountpath} '` >/dev/null 2>&1",
+                "test ! -f ${backup_file}",
+                "test ${backup_lv}"],
+  } ->
   mount { $mountpath:
     ensure  => $mount_ensure,
     device  => "/dev/${volume_group}/${name}",
@@ -57,5 +71,14 @@ define lvm::logical_volume (
     pass    => 2,
     dump    => 1,
     atboot  => true,
+  } ->
+  exec { "restore data from '${mountpath}'":
+    path    => [ '/bin', '/usr/bin' ],
+    command => "tar -xf ${backup_file} && rm -f ${backup_file}",
+    cwd     => $mountpath,
+# Only if $backup_lv, ${backup_file} is a file and ${mountpath} is empty
+    onlyif  => ["test -f ${backup_file}",
+                "test `ls ${mountpath} | grep -v lost+found | wc -l` -eq 0",
+                "test ${backup_lv}"],
   }
 }
