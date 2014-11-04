@@ -63,7 +63,7 @@ define lvm::logical_volume (
     onlyif    => ["test ! `mount | grep '${mountpath} '` >/dev/null 2>&1",
                   "test ! -f ${restore_file}",
                   "test ! `ls ${mountpath} | wc -l` -eq 0",
-                  "test ${restore_content}"],
+                  "test ! ${restore_content}=false"],
   } ->
   mount { $mountpath:
     ensure  => $mount_ensure,
@@ -82,7 +82,7 @@ define lvm::logical_volume (
 # Only if $restore_content, ${restore_file} is a file and ${mountpath} is empty
     onlyif    => ["test -f ${restore_file}",
                   "test `ls ${mountpath} | grep -v lost+found | wc -l` -eq 0",
-                  "test ${restore_content}"],
+                  "test ! ${restore_content}=false"],
   } ->
   exec { "Legacy ${restore_file} file exists":
     path      => [ '/bin', '/usr/bin' ],
