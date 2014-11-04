@@ -56,7 +56,7 @@ define lvm::logical_volume (
   exec { "save data for '${mountpath}'":
     path      => [ '/bin', '/usr/bin' ],
     cwd       => $mountpath,
-    command   => "tar -cf ${backup_file} * && rm -rf '${mountpath}/*'",
+    command   => "tar -cf ${backup_file} * && rm -rf ${mountpath}/*",
     logoutput => true,
 # Only if $backup_lv, ${mountpath} is not mounted working directory 
 # is not empty and ${backup_file} does not exist
