@@ -9,7 +9,7 @@ define lvm::logical_volume (
   $mountpath         = "/${name}",
   $mountpath_require = false,
   $restore_content   = false,
-  $restore_service   = undef,
+  $restore_service   = '',
   $restore_file      = "/tmp/restore-${name}.tar",
 ) {
 
@@ -51,15 +51,15 @@ define lvm::logical_volume (
 
 # Create mountpoint if it does not exist
   exec { "ensure mountpoint '${mountpath}' exists":
-    path    => [ '/bin', '/usr/bin' ],
+    path    => [ '/bin', '/usr/bin', '/sbin' ],
     command => "mkdir -p ${mountpath}",
     unless  => "test -d ${mountpath}",
   } ->
 # Stop service if service named, mount not mounted
   exec { "restore_content: stop ${restore_service}":
-    path      => [ '/bin', '/usr/bin' ],
+    path      => [ '/bin', '/usr/bin', '/sbin' ],
     cwd       => $mountpath,
-    command   => "/sbin/service ${restore_service} stop",
+    command   => "service ${restore_service} stop",
     logoutput => true,
     onlyif    => ["test ${restore_service}",
                   "test `mount | grep '${mountpath} ' | wc -l` -eq 0"],
@@ -67,7 +67,7 @@ define lvm::logical_volume (
 # Save and cleanup local data if restoring content, mount not mounted
 #  local dir has content, restore_file does not exist
   exec { "save and cleanup data from '${mountpath}'":
-    path      => [ '/bin', '/usr/bin' ],
+    path      => [ '/bin', '/usr/bin', '/sbin' ],
     cwd       => $mountpath,
     command   => "tar -cf ${restore_file} * && rm -rf ${mountpath}/*",
     logoutput => true,
@@ -89,7 +89,7 @@ define lvm::logical_volume (
 # If restoring content, a restore file exists, and mount is empty
 #  put local content onto mount
   exec { "restore data to '${mountpath}'":
-    path      => [ '/bin', '/usr/bin' ],
+    path      => [ '/bin', '/usr/bin', '/sbin' ],
     command   => "tar -xf ${restore_file} && rm -f ${restore_file}",
     cwd       => $mountpath,
     logoutput => true,
@@ -99,7 +99,7 @@ define lvm::logical_volume (
   } ->
 # Start service if service named and service not running
   exec { "restore_content: start ${restore_service}":
-    path      => [ '/bin', '/usr/bin' ],
+    path      => [ '/bin', '/usr/bin', '/sbin' ],
     cwd       => $mountpath,
     command   => "/sbin/service ${restore_service} start",
     logoutput => true,
@@ -108,7 +108,7 @@ define lvm::logical_volume (
   } ->
 # Warn if restore file still remains
   exec { "legacy ${restore_file} exists for ${mountpath}":
-    path      => [ '/bin', '/usr/bin' ],
+    path      => [ '/bin', '/usr/bin', '/sbin' ],
     command   => "echo Please review and cleanup ${restore_file}!",
     logoutput => true,
     loglevel  => 'warning',
