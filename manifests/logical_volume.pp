@@ -62,7 +62,7 @@ define lvm::logical_volume (
     command   => "/sbin/service ${restore_service} stop",
     logoutput => true,
     onlyif    => ["test ${restore_service}",
-                  "test ${restore_content}=true",
+                  "test '${restore_content}' = 'true'",
                   "test ! `mount | grep '${mountpath} '` >/dev/null 2>&1"],
   } ->
 # Save and cleanup local data if restoring content, mount unmounted
@@ -74,8 +74,8 @@ define lvm::logical_volume (
     logoutput => true,
     onlyif    => ["test ! `mount | grep '${mountpath} '` >/dev/null 2>&1",
                   "test ! -f ${restore_file}",
-                  "test ! `ls ${mountpath} | wc -l` -eq 0",
-                  "test ! ${restore_content}=false"],
+                  "test '${restore_content}' = 'true'",
+                  "test ! `ls ${mountpath} | wc -l` -eq 0"],
   } ->
 # Mount mountpath
   mount { $mountpath:
@@ -95,8 +95,8 @@ define lvm::logical_volume (
     cwd       => $mountpath,
     logoutput => true,
     onlyif    => ["test -f ${restore_file}",
-                  "test `ls ${mountpath} | grep -v lost+found | wc -l` -eq 0",
-                  "test ! ${restore_content}=false"],
+                  "test '${restore_content}' = 'true'",
+                  "test `ls ${mountpath} | grep -v lost+found | wc -l` -eq 0"],
   } ->
 # Start service if restoring content, service named, service not running
   exec { "restore_content: start ${restore_service}":
@@ -105,7 +105,7 @@ define lvm::logical_volume (
     command   => "/sbin/service ${restore_service} start",
     logoutput => true,
     onlyif    => ["test ${restore_service}",
-                  "test ${restore_content}=true",
+                  "test '${restore_content}' = 'true'",
                   "test ! `service ${restore_service} status | grep running | wc -l`"],
   } ->
 # Warn if restore file still remains
