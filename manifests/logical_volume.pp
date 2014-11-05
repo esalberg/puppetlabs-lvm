@@ -106,7 +106,7 @@ define lvm::logical_volume (
     logoutput => true,
     onlyif    => ["test ${restore_service}",
                   "test '${restore_content}' = 'true'",
-                  "test ! `service ${restore_service} status | grep running | wc -l`"],
+                  "test `service ${restore_service} status | grep running | wc -l` -eq 0"],
   } ->
 # Warn if restore file still remains
   exec { "Legacy ${restore_file} file exists":
