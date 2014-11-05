@@ -55,23 +55,23 @@ define lvm::logical_volume (
     command => "mkdir -p ${mountpath}",
     unless  => "test -d ${mountpath}",
   } ->
-# Stop service if service named, mount unmounted
+# Stop service if service named, mount not mounted
   exec { "restore_content: stop ${restore_service}":
     path      => [ '/bin', '/usr/bin' ],
     cwd       => $mountpath,
     command   => "/sbin/service ${restore_service} stop",
     logoutput => true,
     onlyif    => ["test ${restore_service}",
-                  "test ! `mount | grep '${mountpath} '` >/dev/null 2>&1"],
+                  "test `mount | grep '${mountpath} ' | wc -l` -eq 0"],
   } ->
-# Save and cleanup local data if restoring content, mount unmounted
+# Save and cleanup local data if restoring content, mount not mounted
 #  local dir has content, restore_file does not exist
   exec { "save and cleanup data from '${mountpath}'":
     path      => [ '/bin', '/usr/bin' ],
     cwd       => $mountpath,
     command   => "tar -cf ${restore_file} * && rm -rf ${mountpath}/*",
     logoutput => true,
-    onlyif    => ["test ! `mount | grep '${mountpath} '` >/dev/null 2>&1",
+    onlyif    => ["test `mount | grep '${mountpath} ' | wc -l` -eq 0",
                   "test ! -f ${restore_file}",
                   "test '${restore_content}' = 'true'",
                   "test ! `ls ${mountpath} | wc -l` -eq 0"],
@@ -104,7 +104,7 @@ define lvm::logical_volume (
     command   => "/sbin/service ${restore_service} start",
     logoutput => true,
     onlyif    => ["test ${restore_service}",
-                  "test `service ${restore_service} status | grep running | wc -l` -eq 0"],
+                  "service ${restore_service} status | grep 'is running' | wc -l 0"],
   } ->
 # Warn if restore file still remains
   exec { "legacy ${restore_file} exists for ${mountpath}":
