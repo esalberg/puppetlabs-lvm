@@ -9,6 +9,7 @@ define lvm::logical_volume (
   $mountpath         = "/${name}",
   $mountpath_require = false,
   $restore_content   = false,
+  $restore_service   = undef,
   $restore_file      = '/tmp/restore.tar',
 ) {
 
@@ -48,23 +49,35 @@ define lvm::logical_volume (
     fs_type => $fs_type,
   }
 
+# Create mountpoint if it does not exist
   exec { "ensure mountpoint '${mountpath}' exists":
     path    => [ '/bin', '/usr/bin' ],
     command => "mkdir -p ${mountpath}",
     unless  => "test -d ${mountpath}",
   } ->
+# Stop service if restoring content, service named, mount unmounted
+  exec { "restore_content: stop ${restore_service}":
+    path      => [ '/bin', '/usr/bin' ],
+    cwd       => $mountpath,
+    command   => "/sbin/service ${restore_service} stop",
+    logoutput => true,
+    onlyif    => ["test ${restore_service}",
+                  "test ${restore_content}=true",
+                  "test ! `mount | grep '${mountpath} '` >/dev/null 2>&1"],
+  } ->
+# Save and cleanup local data if restoring content, mount unmounted
+#  local dir has content, restore_file does not exist
   exec { "save and cleanup data from '${mountpath}'":
     path      => [ '/bin', '/usr/bin' ],
     cwd       => $mountpath,
     command   => "tar -cf ${restore_file} * && rm -rf ${mountpath}/*",
     logoutput => true,
-# Only if $restore_content, ${mountpath} is not mounted working directory 
-# is not empty and ${restore_file} does not exist
     onlyif    => ["test ! `mount | grep '${mountpath} '` >/dev/null 2>&1",
                   "test ! -f ${restore_file}",
                   "test ! `ls ${mountpath} | wc -l` -eq 0",
                   "test ! ${restore_content}=false"],
   } ->
+# Mount mountpath
   mount { $mountpath:
     ensure  => $mount_ensure,
     device  => "/dev/${volume_group}/${name}",
@@ -74,16 +87,28 @@ define lvm::logical_volume (
     dump    => 1,
     atboot  => true,
   } ->
+# If restoring content, a restore file exists, and mount is empty
+#  put local content onto mount
   exec { "restore data to '${mountpath}'":
     path      => [ '/bin', '/usr/bin' ],
     command   => "tar -xf ${restore_file} && rm -f ${restore_file}",
     cwd       => $mountpath,
     logoutput => true,
-# Only if $restore_content, ${restore_file} is a file and ${mountpath} is empty
     onlyif    => ["test -f ${restore_file}",
                   "test `ls ${mountpath} | grep -v lost+found | wc -l` -eq 0",
                   "test ! ${restore_content}=false"],
   } ->
+# Start service if restoring content, service named, service not running
+  exec { "restore_content: start ${restore_service}":
+    path      => [ '/bin', '/usr/bin' ],
+    cwd       => $mountpath,
+    command   => "/sbin/service ${restore_service} start",
+    logoutput => true,
+    onlyif    => ["test ${restore_service}",
+                  "test ${restore_content}=true",
+                  "test ! `service ${restore_service} status | grep running | wc -l`"],
+  } ->
+# Warn if restore file still remains
   exec { "Legacy ${restore_file} file exists":
     path      => [ '/bin', '/usr/bin' ],
     command   => "echo Please review and cleanup ${restore_file}!",
