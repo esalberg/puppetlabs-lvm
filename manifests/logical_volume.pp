@@ -56,7 +56,7 @@ define lvm::logical_volume (
     unless  => "test -d ${mountpath}",
   } ->
 # Stop service if service named, mount not mounted
-  exec { "restore_content: stop ${restore_service}":
+  exec { "restore_content: stop ${restore_service} for ${mountpath}":
     path      => [ '/bin', '/usr/bin', '/sbin' ],
     cwd       => $mountpath,
     command   => "service ${restore_service} stop",
@@ -98,7 +98,7 @@ define lvm::logical_volume (
                   "test `ls ${mountpath} | grep -v lost+found | wc -l` -eq 0"],
   } ->
 # Start service if service named and service not running
-  exec { "restore_content: start ${restore_service}":
+  exec { "restore_content: start ${restore_service} for ${mountpath}":
     path      => [ '/bin', '/usr/bin', '/sbin' ],
     cwd       => $mountpath,
     command   => "/sbin/service ${restore_service} start",
