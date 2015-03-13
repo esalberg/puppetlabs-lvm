@@ -126,7 +126,15 @@ Puppet::Type.newtype(:logical_volume) do
           end
       end
   end
-
+  newparam(:unless_lv) do
+    desc "Do not do anything if the LV already exists.  The value should be the
+              name of the logical volume to check for."
+      validate do |value|
+          unless value =~ /^[0-9A-Z]/i
+              raise ArgumentError , "#{value} is not a valid logical volume name"
+          end
+      end
+  end
 
   autorequire(:volume_group) do
     @parameters[:volume_group].value

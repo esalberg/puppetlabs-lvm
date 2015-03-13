@@ -72,7 +72,15 @@ Puppet::Type.type(:logical_volume).provide :lvm do
     end
 
     def exists?
-        lvs(@resource[:volume_group]) =~ lvs_pattern
+        if @resource[:unless_lv]
+          lvs() =~ lvs_unless_pattern
+          rescue Puppet::ExecutionFailure
+          false
+        else
+          lvs(@resource[:volume_group]) =~ lvs_pattern
+          rescue Puppet::ExecutionFailure
+          false
+        end
     end
 
     def size
@@ -229,6 +237,10 @@ Puppet::Type.type(:logical_volume).provide :lvm do
 
     def lvs_pattern
         /\s+#{Regexp.quote @resource[:name]}\s+/
+    end
+
+    def lvs_unless_pattern
+        /\s+#{Regexp.quote @resource[:unless_lv]}\s+/
     end
 
     def path

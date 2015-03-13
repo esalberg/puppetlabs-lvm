@@ -2,7 +2,7 @@
 #
 define lvm::logical_volume (
   $volume_group,
-  $size,
+  $size              = undef,
   $initial_size      = undef,
   $ensure            = present,
   $options           = 'defaults',
@@ -12,6 +12,7 @@ define lvm::logical_volume (
   $mkfs_options      = undef,
   $mountpath         = "/${name}",
   $mountpath_require = false,
+  $unless_lv_fact    = false,
   $extents           = undef,
   $stripes           = undef,
   $stripesize        = undef,
@@ -32,6 +33,7 @@ define lvm::logical_volume (
     default  => mounted,
   }
 
+  if ! str2bool($unless_lv_fact) {
   if $ensure == 'present' {
     Logical_volume[$name] ->
     Filesystem["/dev/${volume_group}/${name}"] ->
@@ -59,7 +61,7 @@ define lvm::logical_volume (
     fs_type => $fs_type,
     options => $mkfs_options,
   }
-
+  }
   exec { "ensure mountpoint '${mountpath}' exists":
     path    => [ '/bin', '/usr/bin' ],
     command => "mkdir -p ${mountpath}",
