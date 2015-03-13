@@ -11,7 +11,7 @@ define lvm::volume_group (
 
   validate_hash($logical_volumes)
 
-#  if $lv_fact_match == undef {
+  if str2bool($lv_fact_match) == false {
     physical_volume { $physical_volumes:
       ensure => $ensure,
     }
@@ -30,5 +30,5 @@ define lvm::volume_group (
         volume_group => $name,
       }
     )
-#  }
+  }
 }
