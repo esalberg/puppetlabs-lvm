@@ -6,12 +6,12 @@ define lvm::volume_group (
   $logical_volumes = {},
   $unless_vg       = undef,
   $createonly      = false,
-  $lv_fact_match   = false,
+  $lv_fact_match   = true,
 ) {
 
   validate_hash($logical_volumes)
 
-  if ! str2bool($::putnam_www) {
+  if ! str2bool($lv_fact_match) {
     physical_volume { $physical_volumes:
       ensure => $ensure,
     }
