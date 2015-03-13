@@ -11,6 +11,7 @@ define lvm::volume_group (
 
   validate_hash($logical_volumes)
 
+  notify{"The lv_fact_match value is: ${lv_fact_match}": }
   if ! $lv_fact_match {
     physical_volume { $physical_volumes:
       ensure => $ensure,
