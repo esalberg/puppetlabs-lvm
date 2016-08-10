@@ -10,7 +10,6 @@ end
 
 # lvm_vgs: [0-9]+
 #   Number of VGs
-vg_list = []
 Facter.add('lvm_vg_list') do
 #  confine :lvm_support => true
   confine :kernel => "Linux"
@@ -24,6 +23,8 @@ Facter.add('lvm_vg_list') do
   end
 end
 
+
+vg_list = []
 vgs = Facter.value (:lvm_vg_list)
 if vgs.nil?
   0
@@ -61,7 +62,6 @@ end
 
 # lvm_pvs: [0-9]+
 #   Number of PVs
-pv_list = []
 Facter.add('lvm_pv_list') do
   confine :kernel => :Linux
   setcode do
@@ -74,6 +74,7 @@ Facter.add('lvm_pv_list') do
   end
 end
 
+pv_list = []
 pvs = Facter.value (:lvm_pv_list)
 if pvs.nil?
   0
