@@ -11,15 +11,32 @@ end
 # lvm_vgs: [0-9]+
 #   Number of VGs
 vg_list = []
-Facter.add('lvm_vgs') do
+Facter.add('lvm_vg_list') do
 #  confine :lvm_support => true
   confine :kernel => "Linux"
   setcode do
-    vgs = Facter::Core::Execution.execute('vgs -o name --noheadings 2>/dev/null', options = {:timeout => 30})
+    vglist = Facter::Core::Execution.execute('vgs -o name --noheadings 2>/dev/null', options = {:timeout => 30})
+    if vglist.nil?
+      0
+    else
+      vglist
+    end
+  end
+end
+
+vgs = Facter.value (:lvm_vg_list)
+if vgs.nil?
+  0
+else
+  vg_list = vgs.split
+end
+
+Facter.add('lvm_vgs') do
+  confine :kernel => :Linux
+  setcode do
     if vgs.nil?
       0
     else
-      vg_list = vgs.split
       vg_list.length
     end
   end
@@ -30,6 +47,7 @@ end
 vg_list.each_with_index do |vg, i|
   Facter.add("lvm_vg_#{i}") { setcode { vg } }
   Facter.add("lvm_vg_#{vg}_pvs") do
+    confine :kernel => "Linux"
     setcode do
       pvs = Facter::Core::Execution.execute("vgs -o pv_name #{vg} 2>/dev/null", options = {:timeout => 30})
       res = nil
