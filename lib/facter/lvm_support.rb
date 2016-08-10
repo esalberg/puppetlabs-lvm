@@ -44,14 +44,31 @@ end
 # lvm_pvs: [0-9]+
 #   Number of PVs
 pv_list = []
+Facter.add('lvm_pv_list') do
+  confine :kernel => :Linux
+  setcode do
+    pvlist = Facter::Core::Execution.execute('pvs -o name --noheadings 2>/dev/null', options = {:timeout => 30})
+    if pvlist.nil?
+      0
+    else
+      pvlist
+    end
+  end
+end
+
+pvs = Facter.value (:lvm_pv_list)
+if pvs.nil?
+  0
+else
+  pv_list = pvs.split
+end
+
 Facter.add('lvm_pvs') do
   confine :kernel => :Linux
   setcode do
-    pvs = Facter::Core::Execution.execute('pvs -o name --noheadings 2>/dev/null', options = {:timeout => 30})
     if pvs.nil?
       0
     else
-      pv_list = pvs.split
       pv_list.length
     end
   end
