@@ -44,7 +44,7 @@ end
 #   Number of PVs
 pv_list = []
 Facter.add('lvm_pvs') do
-  confine :lvm_support
+  confine :kernel => :linux
   pvs = Facter::Core::Execution.execute('pvs -o name --noheadings 2>/dev/null', options = {:timeout => 30})
   if pvs.nil?
     setcode { 0 }
