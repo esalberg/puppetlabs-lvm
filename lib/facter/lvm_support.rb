@@ -11,18 +11,18 @@ end
 
 # lvm_vgs: [0-9]+
 #   Number of VGs
-vg_list = []
-Facter.add('lvm_vgs') do
-  confine :kernel => :linux
-  confine :lvm_support => true
-  vgs = Facter::Core::Execution.execute('vgs -o name --noheadings 2>/dev/null', options = {:timeout => 30})
-  if vgs.nil?
-    setcode { 0 }
-  else
-    vg_list = vgs.split
-    setcode { vg_list.length }
-  end
-end
+#vg_list = []
+#Facter.add('lvm_vgs') do
+#  confine :kernel => :linux
+#  confine :lvm_support => true
+#  vgs = Facter::Core::Execution.execute('vgs -o name --noheadings 2>/dev/null', options = {:timeout => 30})
+#  if vgs.nil?
+#    setcode { 0 }
+#  else
+#    vg_list = vgs.split
+#    setcode { vg_list.length }
+#  end
+#end
 
 # lvm_vg_[0-9]+
 #   VG name by index
