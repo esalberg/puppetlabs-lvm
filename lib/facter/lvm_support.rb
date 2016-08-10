@@ -18,7 +18,7 @@ Facter.add('lvm_vg_list') do
     if vglist.nil?
       0
     else
-      vglist
+      vglist.split
     end
   end
 end
@@ -29,7 +29,7 @@ vgs = Facter.value (:lvm_vg_list)
 if vgs.nil?
   0
 else
-  vg_list = vgs.split
+  vg_list = vgs
 end
 
 Facter.add('lvm_vgs') do
