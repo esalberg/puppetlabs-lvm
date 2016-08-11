@@ -10,6 +10,7 @@ end
 
 # lvm_vgs: [0-9]+
 #   Number of VGs
+vg_list = []
 Facter.add('lvm_vg_list') do
 #  confine :lvm_support => true
   confine :kernel => "Linux"
@@ -18,20 +19,21 @@ Facter.add('lvm_vg_list') do
     if vglist.nil?
       0
     else
-      vglist
+      vg_list = vglist.split('\n').map!(&:strip)
+      vg_list
     end
   end
 end
 
 
-vg_list = []
-vgs = Facter.value (:lvm_vg_list)
-if vgs.nil?
-  0
-else
-  vg_list = vgs.split
+#vg_list = []
+#vgs = Facter.value (:lvm_vg_list)
+#if vgs.nil?
+#  0
+#else
+#  vg_list = vgs.split
 #  vg_list = vgs.split("\n").select{|l| l =~ /^\s+\// }.collect(&:strip).sort.join(',')
-end
+#end
 
 Facter.add('lvm_vgs') do
   confine :kernel => :Linux
