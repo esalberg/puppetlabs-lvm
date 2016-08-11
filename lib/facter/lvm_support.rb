@@ -14,28 +14,27 @@ Facter.add('lvm_vg_list') do
 #  confine :lvm_support => true
   confine :kernel => "Linux"
   setcode do
-    vg_list = []
+#    vg_list = []
 #    vglist = Facter::Core::Execution.execute('vgs -o name --noheadings 2>/dev/null', options = {:timeout => 30})
     vglist = Facter::Core::Execution.execute('vgs -o name --noheadings --rows 2>/dev/null', options = {:timeout => 30})
     if vglist.nil?
       0
     else
-      vglist.lstrip
-#      vg_list = vglist.split
+      vg_list = vglist.strip
 #      vg_list.delete_if{|e| e.length == 0}
-      vglist
+#      vg_list
     end
   end
 end
 
 
-#vg_list = []
-#vgs = Facter.value (:lvm_vg_list)
-#if vgs.nil?
-#  0
-#else
-#  vg_list = vgs.split
-#end
+vg_list = []
+vgs = Facter.value (:lvm_vg_list)
+if vgs.nil?
+  0
+else
+  vg_list = vgs.split
+end
 
 vgs = Facter.value (:lvm_vg_list)
 
