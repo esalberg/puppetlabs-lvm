@@ -19,7 +19,7 @@ Facter.add('lvm_vg_list') do
     if vglist.nil?
       0
     else
-      vg_list = vglist.split('\n').map!(&:strip)
+      vg_list = vglist.split('\n')
       vg_list
     end
   end
