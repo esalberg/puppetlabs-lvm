@@ -28,7 +28,7 @@ Facter.add('lvm_vg_list') do
 end
 
 vgs = Facter.value(:lvm_vg_list)
-vgs.nil? ? [] : vgs
+#vgs.nil? ? [] : vgs
 
 # lvm_vgs: [0-9]+
 #   Number of VGs
@@ -45,7 +45,7 @@ end
 
 # lvm_vg_[0-9]+
 #   VG name by index
-vgs.each_with_index do |vg, i|
+Array(vgs).each_with_index do |vg, i|
   Facter.add("lvm_vg_#{i}") { setcode { vg } }
   Facter.add("lvm_vg_#{vg}_pvs") do
     confine :kernel => "Linux"
