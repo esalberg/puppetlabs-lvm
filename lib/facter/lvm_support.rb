@@ -32,7 +32,7 @@ if kernel = 'Linux' and lvm_support
   if vglist.nil?
     0
   else
-    vg_list = vglist
+    vg_list = vglist.split['\n']
   end
 end
 
