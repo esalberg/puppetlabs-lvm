@@ -18,7 +18,7 @@ Facter.add('lvm_vg_list') do
     if vglist.nil?
       0
     else
-      vg_list
+      vglist
     end
   end
 end
