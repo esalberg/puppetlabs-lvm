@@ -25,7 +25,7 @@ Facter.add('lvm_vg_list') do
   end
 end
 
-vgs = Facter.value (:lvm_vg_list)
+vgs = Facter.value(:lvm_vg_list)
 
 # lvm_vgs: [0-9]+
 #   Number of VGs
