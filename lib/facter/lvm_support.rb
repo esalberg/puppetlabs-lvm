@@ -18,7 +18,7 @@ Facter.add('lvm_vg_list') do
     if vglist.nil?
       0
     else
-      vglist.split['\n']
+      vglist
     end
   end
 end
