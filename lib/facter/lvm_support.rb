@@ -17,7 +17,7 @@ Facter.add('lvm_vg_list') do
   setcode do
     vglist = Facter::Core::Execution.execute('vgs -o name --noheadings --rows 2>/dev/null', options = {:timeout => 30})
     if vglist.nil?
-      0
+      []
     else
 #      vg_clean = vglist.strip
       vgs = vglist.split
