@@ -12,7 +12,7 @@ end
 # lvm_vg_list: [a-z]+
 #   Array of VG names
 Facter.add('lvm_vg_list') do
-  confine :lvm_support => :true
+  confine :lvm_support => true
   setcode do
     vglist = Facter::Core::Execution.execute('vgs -o name --noheadings --rows 2>/dev/null', options = {:timeout => 30})
     if vglist.nil?
