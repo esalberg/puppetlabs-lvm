@@ -19,8 +19,9 @@ Facter.add('lvm_vg_list') do
     if vglist.nil?
       0
     else
-      vg_list = vglist.strip.split
-      vg_list
+      vg_list = vglist.strip
+      vg_array = vg_list.split
+      vg_array
     end
   end
 end
