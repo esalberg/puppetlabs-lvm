@@ -29,7 +29,7 @@ vgs = Facter.value (:lvm_vg_list)
 if vgs.nil?
   0
 else
-  vg_list = vgs.split("\n")
+  vg_list = vgs.split
 #  vg_list = vgs.split("\n").select{|l| l =~ /^\s+\// }.collect(&:strip).sort.join(',')
 end
 
