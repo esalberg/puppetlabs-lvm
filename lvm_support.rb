@@ -8,6 +8,7 @@ Facter.add('lvm_support') do
   end
 end
 
+
 # lvm_vgs: [0-9]+
 #   Number of VGs
 Facter.add('lvm_vg_list') do
