@@ -21,9 +21,9 @@ Facter.add('lvm_vg_list') do
       0
     else
       vglist.lstrip
-      vg_list = vglist.split
-      vg_list.delete_if{|e| e.length == 0}
-      vg_list
+#      vg_list = vglist.split
+#      vg_list.delete_if{|e| e.length == 0}
+      vglist
     end
   end
 end
