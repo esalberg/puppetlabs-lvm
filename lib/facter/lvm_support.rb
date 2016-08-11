@@ -19,8 +19,9 @@ Facter.add('lvm_vg_list') do
     if vglist.nil?
       0
     else
-      vg_list = vglist.split
-      vg_list.delete_if{|e| e.length == 0}
+       vg_list = vglist.lines
+#      vg_list = vglist.split("\n")
+#      vg_list.delete_if{|e| e.length == 0}
       vg_list
     end
   end
