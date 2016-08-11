@@ -34,21 +34,25 @@ end
 #  vg_list = vgs.split
 #end
 
+vgs = Facter.value (:lvm_vg_list)
+
 Facter.add('lvm_vgs') do
   confine :kernel => :Linux
-  vgs = Facter.value (:lvm_vg_list)
+#  vgs = Facter.value (:lvm_vg_list)
   setcode do
     if vgs.nil?
       0
     else
-      vg_list.length
+#      vg_list.length
+      vgs.length
     end
   end
 end
 
 # lvm_vg_[0-9]+
 #   VG name by index
-vg_list.each_with_index do |vg, i|
+vgs.each_with_index do |vg, i|
+#vg_list.each_with_index do |vg, i|
   Facter.add("lvm_vg_#{i}") { setcode { vg } }
   Facter.add("lvm_vg_#{vg}_pvs") do
     confine :kernel => "Linux"
