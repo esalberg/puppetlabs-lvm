@@ -1,40 +1,53 @@
 # lvm_support: true/nil
 #   Whether there is LVM support (based on the presence of the "vgs" command)
 Facter.add('lvm_support') do
-  confine :kernel => :Linux
+  confine :kernel => "Linux"
 
   setcode do
-    vgdisplay = Facter::Util::Resolution.which('vgs')
-    vgdisplay.nil? ? nil : true
+    Facter::Core::Execution.which('vgs') != nil
   end
 end
 
-# lvm_vg_list: [0-9]+
-#   Array of VG names
+# lvm_vgs: [0-9]+
+#   Number of VGs
 Facter.add('lvm_vg_list') do
-  confine :lvm_support => :true
-#  confine :kernel => :Linux
+#  confine :lvm_support => true
+  confine :kernel => "Linux"
   setcode do
+#    vg_list = []
+#    vglist = Facter::Core::Execution.execute('vgs -o name --noheadings 2>/dev/null', options = {:timeout => 30})
     vglist = Facter::Core::Execution.execute('vgs -o name --noheadings --rows 2>/dev/null', options = {:timeout => 30})
     if vglist.nil?
       0
     else
-      vg_list = vglist.strip.split
-      vg_list
+      vg_list = vglist.strip
+      vg_array = vg_list.split
+      vg_array
+#      vg_list.delete_if{|e| e.length == 0}
+#      vg_list
     end
   end
 end
 
+
+#vg_list = []
+#vgs = Facter.value (:lvm_vg_list)
+#if vgs.nil?
+#  0
+#else
+#  vg_list = vgs.split
+#end
+
 vgs = Facter.value (:lvm_vg_list)
 
-# lvm_vgs: [0-9]+
-#   Number of VGs
 Facter.add('lvm_vgs') do
   confine :kernel => :Linux
+#  vgs = Facter.value (:lvm_vg_list)
   setcode do
     if vgs.nil?
       0
     else
+#      vg_list.length
       vgs.length
     end
   end
@@ -43,6 +56,7 @@ end
 # lvm_vg_[0-9]+
 #   VG name by index
 vgs.each_with_index do |vg, i|
+#vg_list.each_with_index do |vg, i|
   Facter.add("lvm_vg_#{i}") { setcode { vg } }
   Facter.add("lvm_vg_#{vg}_pvs") do
     confine :kernel => "Linux"
