@@ -15,7 +15,8 @@ Facter.add('lvm_vg_list') do
   confine :kernel => "Linux"
   setcode do
     vg_list = []
-    vglist = Facter::Core::Execution.execute('vgs -o name --noheadings 2>/dev/null', options = {:timeout => 30})
+#    vglist = Facter::Core::Execution.execute('vgs -o name --noheadings 2>/dev/null', options = {:timeout => 30})
+    vglist = Facter::Core::Execution.execute('vgs -o name --noheadings --rows 2>/dev/null', options = {:timeout => 30})
     if vglist.nil?
       0
     else
