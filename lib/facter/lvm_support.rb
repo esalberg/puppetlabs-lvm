@@ -38,11 +38,11 @@ end
 #  vg_list = vgs.split
 #end
 
-#vgs = Facter.value (:lvm_vg_list)
+vgs = Facter.value (:lvm_vg_list)
 
 Facter.add('lvm_vgs') do
   confine :kernel => :Linux
-  vgs = Facter.value (:lvm_vg_list)
+#  vgs = Facter.value (:lvm_vg_list)
   setcode do
     if vgs.nil?
       0
