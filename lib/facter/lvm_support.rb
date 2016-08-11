@@ -37,6 +37,7 @@ end
 
 Facter.add('lvm_vgs') do
   confine :kernel => :Linux
+  vgs = Facter.value (:lvm_vg_list)
   setcode do
     if vgs.nil?
       0
