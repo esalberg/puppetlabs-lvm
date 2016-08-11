@@ -11,6 +11,7 @@ end
 
 # lvm_vg_list: [a-z]+
 #   Array of VG names
+vgs = []
 Facter.add('lvm_vg_list') do
 #  confine :lvm_support => true
   confine :kernel => :Linux
@@ -19,14 +20,14 @@ Facter.add('lvm_vg_list') do
     if vglist.nil?
       0
     else
-      vg_list = vglist.strip
-      vg_array = vg_list.split
-      vg_array
+#      vg_clean = vglist.strip
+      vgs = vglist.split
+      vgs
     end
   end
 end
 
-vgs = Facter.value (:lvm_vg_list)
+#vgs = Facter.value (:lvm_vg_list)
 
 # lvm_vgs: [0-9]+
 #   Number of VGs
