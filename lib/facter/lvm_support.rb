@@ -16,7 +16,7 @@ Facter.add('lvm_vgs') do
   confine :lvm_support => true
 
   setcode do
-    vgs = Facter::Util::Resolution.exec('vgs -o name --noheadings 2>/dev/null')
+    vgs = Facter::Core::Execution.execute('vgs -o name --noheadings 2>/dev/null')
     return 0 if vgs.nil?
 
     vg_list = vgs.split
@@ -30,7 +30,7 @@ vg_list.each_with_index do |vg, i|
   Facter.add("lvm_vg_#{i}") { setcode { vg } }
   Facter.add("lvm_vg_#{vg}_pvs") do
     setcode do
-      pvs = Facter::Util::Resolution.exec("vgs -o pv_name #{vg} 2>/dev/null")
+      pvs = Facter::Core::Execution.execute("vgs -o pv_name #{vg} 2>/dev/null")
       res = nil
       unless pvs.nil?
         res = pvs.split("\n").select{|l| l =~ /^\s+\// }.collect(&:strip).sort.join(',')
@@ -47,7 +47,7 @@ Facter.add('lvm_pvs') do
   confine :lvm_support => true
 
   setcode do
-    pvs = Facter::Util::Resolution.exec('pvs -o name --noheadings 2>/dev/null')
+    pvs = Facter::Core::Execution.execute('pvs -o name --noheadings 2>/dev/null')
     return 0 if vgs.nil?
 
     pv_list = pvs.split
