@@ -14,12 +14,13 @@ end
 vg_list = []
 Facter.add('lvm_vgs') do
   confine :lvm_support => true
-  vgs = Facter::Util::Resolution.exec('vgs -o name --noheadings 2>/dev/null')
-  if vgs.nil?
-    setcode { 0 }
-  else
+
+  setcode do
+    vgs = Facter::Util::Resolution.exec('vgs -o name --noheadings 2>/dev/null')
+    return 0 if vgs.nil?
+
     vg_list = vgs.split
-    setcode { vg_list.length }
+    vg_list.length
   end
 end
 
@@ -44,12 +45,13 @@ end
 pv_list = []
 Facter.add('lvm_pvs') do
   confine :lvm_support => true
-  pvs = Facter::Util::Resolution.exec('pvs -o name --noheadings 2>/dev/null')
-  if pvs.nil?
-    setcode { 0 }
-  else
+
+  setcode do
+    pvs = Facter::Util::Resolution.exec('pvs -o name --noheadings 2>/dev/null')
+    return 0 if vgs.nil?
+
     pv_list = pvs.split
-    setcode { pv_list.length }
+    pv_list.length
   end
 end
 
