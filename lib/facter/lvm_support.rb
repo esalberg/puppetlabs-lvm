@@ -48,7 +48,7 @@ Facter.add('lvm_pvs') do
 
   setcode do
     pvs = Facter::Core::Execution.execute('pvs -o name --noheadings 2>/dev/null')
-    return 0 if vgs.nil?
+    return 0 if pvs.nil?
 
     pv_list = pvs.split
     pv_list.length
