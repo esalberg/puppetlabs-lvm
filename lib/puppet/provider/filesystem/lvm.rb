@@ -9,9 +9,19 @@ Puppet::Type.type(:filesystem).provide :lvm do
     mkfs(@resource[:fs_type], @resource[:name])
   end
 
-  def exists?
-    fstype == @resource[:fs_type]
-  end
+    def exists?
+        if @resource[:createfsonly]
+          begin
+            if fstype.nil? || fstype.empty?
+              false
+            else
+              true
+            end
+          end
+        else
+          fstype == @resource[:fs_type]
+        end
+    end
 
   def destroy
     # no-op

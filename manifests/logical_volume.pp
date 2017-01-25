@@ -7,7 +7,7 @@ define lvm::logical_volume (
   Enum['absent', 'present'] $ensure  = present,
   $options                           = 'defaults',
   $pass                              = '2',
-  $dump                              = '0',
+  $dump                              = '1',
   $fs_type                           = 'ext4',
   $mkfs_options                      = undef,
   Stdlib::Absolutepath $mountpath    = "/${name}",
@@ -28,6 +28,7 @@ define lvm::logical_volume (
   $no_sync                           = undef,
   $region_size                       = undef,
   $alloc                             = undef,
+  Boolean $createfsonly              = false,
 ) {
 
   $lvm_device_path = "/dev/${volume_group}/${name}"
@@ -94,9 +95,10 @@ define lvm::logical_volume (
 
   if $createfs {
     filesystem { $lvm_device_path:
-      ensure  => $ensure,
-      fs_type => $fs_type,
-      options => $mkfs_options,
+      ensure       => $ensure,
+      fs_type      => $fs_type,
+      options      => $mkfs_options,
+      createfsonly => $createfsonly,
     }
   }
 
