@@ -50,5 +50,25 @@ describe provider_class do
       @provider.create
     end
   end
+  describe "when checking existence" do
+    it "should not return exists with fs_type mismatch" do
+      @resource.expects(:[]).with(:createfsonly).returns(false)
+      @resource.expects(:[]).with(:fstype).returns('ext3')
+      @resource.expects(:[]).with(:fs_type).returns('ext4')
+      @provider.should_not be_exists
+    end
+    it "should return exists with fs_type mismatch with createfsonly" do
+      @resource.expects(:[]).with(:createfsonly).returns(true)
+      @resource.expects(:[]).with(:fstype).returns('ext3')
+      @resource.expects(:[]).with(:fs_type).returns('ext4')
+      @provider.should be_exists
+    end
+    it "should not return exists with no fstype result" do
+      @resource.expects(:[]).with(:createfsonly).returns(true)
+      @resource.expects(:[]).with(:fstype).returns()
+      @resource.expects(:[]).with(:fs_type).returns('ext4')
+      @provider.should_not be_exists
+    end
+  end
 
 end
