@@ -10,7 +10,7 @@ define lvm::logical_volume (
   $dump                              = '1',
   $fs_type                           = 'ext4',
   $mkfs_options                      = undef,
-  Stdlib::Absolutepath $mountpath    = "/${name}",
+  Variant[Stdlib::Absolutepath, String] $mountpath = "/${name}",
   Boolean $mountpath_require         = false,
   Boolean $mounted                   = true,
   Boolean $createfs                  = true,
