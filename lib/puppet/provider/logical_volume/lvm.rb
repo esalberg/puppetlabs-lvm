@@ -15,8 +15,8 @@ Puppet::Type.type(:logical_volume).provide :lvm do
            blkid: 'blkid',
            dmsetup: 'dmsetup',
            lvconvert: 'lvconvert',
-           lvdisplay: 'lvdisplay',
-           lsblk: 'lsblk'
+           lvdisplay: 'lvdisplay'
+#           lsblk: 'lsblk'
 
   optional_commands xfs_growfs: 'xfs_growfs',
                     resize4fs: 'resize4fs'

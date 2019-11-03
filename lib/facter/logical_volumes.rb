@@ -2,6 +2,7 @@ Facter.add(:logical_volumes) do
   # Fact should be confined to only linux servers that have the lvs command
   confine do
     Facter.value('kernel') == 'Linux' &&
+      Facter.value('operatingsystemmajrelease') != '5' &&
       Facter::Core::Execution.which('lvs')
   end
 

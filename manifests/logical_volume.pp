@@ -29,9 +29,16 @@ define lvm::logical_volume (
   $region_size                       = undef,
   $alloc                             = undef,
   Boolean $createfsonly              = false,
+  Variant[String, Undef] $uuid       = undef,
 ) {
 
   $lvm_device_path = "/dev/${volume_group}/${name}"
+
+  if $uuid {
+    $lvm_mount_path = $uuid
+  } else {
+    $lvm_mount_path = $lvm_device_path
+  }
 
   if $mountpath_require and $fs_type != 'swap' {
     Mount {
@@ -115,7 +122,7 @@ define lvm::logical_volume (
     mount { $mount_title:
       ensure  => $mount_ensure,
       name    => $fixed_mountpath,
-      device  => $lvm_device_path,
+      device  => $lvm_mount_path,
       fstype  => $fs_type,
       options => $options,
       pass    => $fixed_pass,
