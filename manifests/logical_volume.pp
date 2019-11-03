@@ -29,9 +29,8 @@ define lvm::logical_volume (
   $region_size                       = undef,
   $alloc                             = undef,
   Boolean $createfsonly              = false,
+  String $lvm_device_path            = "/dev/${volume_group}/${name}",
 ) {
-
-  $lvm_device_path = "/dev/${volume_group}/${name}"
 
   if $mountpath_require and $fs_type != 'swap' {
     Mount {
