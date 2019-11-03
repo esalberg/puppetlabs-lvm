@@ -12,8 +12,8 @@ Puppet::Type.newtype(:filesystem) do
   newparam(:name) do
     isnamevar
     validate do |value|
-      unless Pathname.new(value).absolute?
-        raise ArgumentError, 'Filesystem names must be fully qualified'
+      unless Pathname.new(value).absolute? || value.start_with?('UUID=')
+        raise ArgumentError, 'Filesystem names must be fully qualified or start with UUID='
       end
     end
   end

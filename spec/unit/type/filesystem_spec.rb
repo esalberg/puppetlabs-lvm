@@ -23,4 +23,15 @@ describe Puppet::Type.type(:filesystem) do
       )
     }.not_to raise_error
   end
+
+  it 'does not raise an ArgumentError when the name is UUID' do
+    expect {
+      resource = Puppet::Type.type(:filesystem).new(
+        name: 'UUID=abcd1234',
+        ensure: :present,
+        fs_type: 'ext3',
+        options: '-b 4096 -E stride=32,stripe-width=64',
+      )
+    }.not_to raise_error
+  end
 end
